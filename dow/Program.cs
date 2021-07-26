@@ -35,26 +35,26 @@ namespace dow
             //thread.Start();
             //while (true)
             //{
-
+           
             //    if ("1" == Console.ReadLine())
-            //    {
+        //    {
             //        Console.WriteLine("放行");
             //        manualResetEvent.Set();
-            //    }
+        //    }
             //    else 
-            //    {
+        //    {
             //        Console.WriteLine("不放行");
             //        manualResetEvent.Reset();
-            //    }
+        //    }
             //    Console.WriteLine(thread.ThreadState.ToString());
-            //}
+        //}
 
 
 
+                }
         }
-    }
-
-}
+            
+        }
 
 
 
