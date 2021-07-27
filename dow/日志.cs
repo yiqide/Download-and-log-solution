@@ -8,6 +8,8 @@ namespace dow
 {
     /// <summary>
     /// 日志系统
+    /// 使用方法：new 一个日志
+    /// 然后使用addLog()就可以了
     /// </summary>
     public class 日志
     {

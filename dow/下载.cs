@@ -8,10 +8,6 @@ using System.Threading.Tasks;
 
 namespace dow
 {
-    class 下载
-    {
-    }
-
     /// <summary>
     /// 异步下载任务系统下载解决方案
     /// </summary>
@@ -81,6 +77,8 @@ namespace dow
                     {
                         case DowState.Defeat:
                             RemoveOdlState(state);
+                            //如果失败移除已下载的文件
+
                             break;
                         case DowState.Done:
                             RemoveOdlState(state);
@@ -120,60 +118,50 @@ namespace dow
 
             public float DowDateSzie = 0;
             public float speed;
-            private Thread thread;
-
+            private Thread dowThread;
+            private Thread numThread;
+            private ManualResetEvent manualResetEvent;
 
             public void GoOn()
             {
-
+                if (manualResetEvent != null) manualResetEvent.Reset();
             }
             /// <summary>
             /// 暂停
             /// </summary>
             public void Stop()
             {
-                if (thread != null) thread.Join();
+                if (manualResetEvent != null) manualResetEvent.Set();
 
             }
 
-
+            public void 取消()
+            {
+                dowThread.Abort();
+                numThread.Abort();
+                State = DowState.Defeat;
+            }
+            
             public void Start()
             {
                 State = DowState.UnderWay;
-                thread = new Thread(() => {
-                    DownloadAssetAsync(url, path);
-                });
-                Thread thread2 = new Thread(() =>
-                {
-                    float star = DowDateSzie;
-                    while (true)
-                    {
-                        speed = DowDateSzie - star;
-                        star = DowDateSzie;
-                        Thread.CurrentThread.Join(1000);
-                    }
-                });
-                thread2.Start();
-                thread.Start();
-            }
-            private void DownloadAssetAsync(string url, string filePath)
-            {
-                try
-                {
+                manualResetEvent = new ManualResetEvent(true);
+                dowThread = new Thread(() => {
+                    
                     WebRequest Myrq = HttpWebRequest.Create(url);
                     WebResponse myrp = Myrq.GetResponse();
                     Stream st = myrp.GetResponseStream();
-                    Stream so = new System.IO.FileStream(filePath, System.IO.FileMode.Create);
+                    Stream so = new System.IO.FileStream(path, System.IO.FileMode.Create);
                     byte[] by = new byte[1024 * 16];
                     int osize = st.Read(by, 0, (int)by.Length);
                     int count = 0;
                     while (osize > 0)
                     {
+                        manualResetEvent.WaitOne();
                         so.Write(by, 0, osize);
                         osize = st.Read(by, 0, (int)by.Length);
                         count++;
                         DowDateSzie = count * (float)16 / 1024;
-
                     }
                     so.Close();
                     so.Dispose();
@@ -183,14 +171,22 @@ namespace dow
                     myrp.Dispose();
                     Myrq.Abort();
                     State = DowState.Done;
-                }
-                catch (System.Exception e)
+                });//负责下载
+                numThread = new Thread(() =>
                 {
-                    State = DowState.Defeat;
-                    throw e;
-                }
+                    float star = DowDateSzie;
+                    while (true)
+                    {
+                        manualResetEvent.WaitOne();
+                        speed = DowDateSzie - star;
+                        star = DowDateSzie;
+                        Thread.CurrentThread.Join(1000);
+                    }
+                });
+                numThread.Start();
+                dowThread.Start();
             }
-
+   
             public DowTask(string path, string url, string name)
             {
                 this.path = path;
@@ -227,22 +223,5 @@ namespace dow
             fileStream.Close();
             fileStream.Dispose();
         }
-
-        //public static async Task WriteAppendAsync(string path, string data)
-        //{
-        //    if (!File.Exists(path))
-        //    {
-        //        File.Create(path).Dispose();
-        //    }
-        //    if (FileHanldAsync.fileStream == null)
-        //    {
-        //        fileStream = new FileStream(path, FileMode.Append);
-        //    }
-        //    data = System.Environment.NewLine + data;
-        //    byte[] bytes = UnicodeEncoding.UTF8.GetBytes(data);
-        //    await fileStream.WriteAsync(bytes, 0, bytes.Length);
-        //}
-
-
     }
 }
