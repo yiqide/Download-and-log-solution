@@ -19,7 +19,7 @@ namespace dow
             //string path= @"D:\txt.txt";
             //string url = @"http://downloadg.dewmobile.net/official/ZapyaPC2803Lite.exe";
             Console.ReadKey();
-
+            //Json.JsonTo<>
         }
     }
             
