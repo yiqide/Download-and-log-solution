@@ -11,13 +11,12 @@ internal class 服务器
     public List<Socket> clients = new List<Socket>();
     private IPEndPoint iPEndPoint;
     private Queue<Data> massges = new Queue<Data>();
-    public 服务器(string 域名, int port)
+    public 服务器(int port)
     {
-        IPHostEntry iPHostEntry = Dns.GetHostEntry(域名);
-        IPAddress iPAddress = iPHostEntry.AddressList[0];
-        iPEndPoint = new IPEndPoint(iPAddress, port);
-        socket = new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+        iPEndPoint = new IPEndPoint(IPAddress.Any, port);
+        socket = new Socket(IPAddress.Any.AddressFamily, SocketType.Stream,ProtocolType.Tcp);
         Console.WriteLine(iPEndPoint);
+        Console.WriteLine(Dns.GetHostName());
     }
     public void Start()
     {
@@ -47,14 +46,15 @@ internal class 服务器
         {
             while (true)
             {
-                byte[] buff = new byte[1024];
+                byte[] buff = new byte[1024*1024];
                 int count = c.Receive(buff);
                 data += Encoding.UTF8.GetString(buff, 0, count);
-                if (c.Available<=0)
-                {
-                    //出现结束标记
-                    break;
-                }
+                break;
+                //if (c.Available<=0)
+                //{
+                //    //出现结束标记
+                //    break;
+                //}
             }
             Addtask(new Data(c, data)); //传递到消息队列
             data = "";
@@ -73,7 +73,7 @@ internal class 服务器
         {
             ManualResetEvent.WaitOne();
             massges.TryPeek(out data);
-            if (data == null)
+            if (data != null)
             {
                 处理消息(data.client, data.obj);
                 massges.Dequeue();

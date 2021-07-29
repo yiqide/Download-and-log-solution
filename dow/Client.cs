@@ -15,10 +15,11 @@ public class Client
     {
         Thread thread = new Thread(() =>
         {
-            client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
             var iPHostEntry = Dns.GetHostEntry(hostName);
             var iPAddress = iPHostEntry.AddressList[0];
             IPEndPoint endPoint = new IPEndPoint(iPAddress, port);
+            client = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             client.Connect(endPoint);
             isRead = true;
             ManualResetEvent = new ManualResetEvent(true);
@@ -27,39 +28,43 @@ public class Client
                 SendPkg sendPkg = null;
                 while (true)
                 {
+                    Console.WriteLine("131");
                     ManualResetEvent.WaitOne();
                     sendPkgs.TryPeek(out sendPkg);
                     if (sendPkg == null)
                     {
-                        ManualResetEvent.Set();
+                        ManualResetEvent.Reset();
                     }
                     else
                     {
                         switch (sendPkg.sendType)
                         {
                             case sendType.massegs:
-                                SendMassgs(sendPkg);
+                                SendMassgs(sendPkg.MassegsPkg);
                                 break;
                             case sendType.Null:
                                 break;
                         }
+                        Console.WriteLine("发送了消息");
                         sendPkgs.Dequeue();
-                        
+
                     }
                 }
 
             });
+            thread1.Start();
         });
         thread.Start();
 
     }
-    private void SendMassgs(SendPkg sendPkg)
+    private void SendMassgs(MassegsPkg sendPkg)
     {
-        client.Send(Jons.ToJsonToByte<SendPkg>(sendPkg));
+        client.Send(Jons.ToJsonToByte<MassegsPkg>(sendPkg));
     }
     public void AddTask(SendPkg pkg) 
     {
         sendPkgs.Enqueue(pkg);
+        ManualResetEvent.Set();
     }
 
 }
@@ -86,7 +91,7 @@ public class SendPkg
 /// </summary>
 public class MassegsPkg
 {
-    public string massegs;
+    public string massegs { get; set; }
     public MassegsPkg(string massegs) 
     {
         this.massegs = massegs;

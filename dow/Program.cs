@@ -16,16 +16,16 @@ namespace dow
     {
         static void Main(string[] args)
         {
-            服务器 server = new 服务器("dujiaoshou.store",6666);
-            server.Start();
-            //Client client = new Client();
-            //client.StartConnect("dujiaoshou.store",6666);
-            //while (true)
-            //{
-            //    string s= Console.ReadLine();
-            //    client.AddTask(new SendPkg(sendType.massegs,new MassegsPkg(s)));
-            //}
-           
+            //服务器 server = new 服务器(6666);
+            //server.Start();
+            Client client = new Client();
+            client.StartConnect("dujiaoshou.store", 6666);
+            while (true)
+            {
+                string s = Console.ReadLine();
+                client.AddTask(new SendPkg(sendType.massegs, new MassegsPkg(s)));
+            }
+
         }
     }
             
