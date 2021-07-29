@@ -6,9 +6,7 @@ using System.Text.Unicode;
 
 namespace dow
 {
-    public class 序列化
-    {
-        /*
+    /*
 /// 注意 这个序列化不支持字段，范型，接口
 /// 支持多语言
 /// 不需要使用额外的特性
@@ -33,7 +31,7 @@ namespace dow
 ///System.Collections.Specialized
 ///System.Collections.ObjectModel
 */
-        /// <summary>
+    /// <summary>
         ///默认情况下，属性名称匹配区分大小写。 可以指定不区分大小写
         ///ASP.NET Core 应用默认指定不区分大小写。
         ///如果 JSON 包含只读属性的值，则会忽略该值，并且不引发异常。
@@ -44,7 +42,7 @@ namespace dow
         ///默认情况下，JSON 中的注释或尾随逗号会引发异常。 可以允许注释和尾随逗号。
         ///默认最大深度为 64。
         /// </summary>
-        public static class Jons
+    public static class Jons
         {
 
             public static string ToJsonString<T>(T json)
@@ -104,7 +102,5 @@ namespace dow
                 T t = JsonSerializer.Deserialize<T>(ref utf8Reader, option);
                 return t;
             }
-        }
-
-    }
+        } 
 }

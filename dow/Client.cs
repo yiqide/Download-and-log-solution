@@ -3,9 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using dow;
+
 namespace Client
 {
     public class Client
@@ -41,8 +40,10 @@ namespace Client
                             switch (sendPkg.sendType)
                             {
                                 case sendType.File:
+                                    SendFile(sendPkg);
                                     break;
-                                case sendType.strings:
+                                case sendType.massegs:
+                                    SendMassgs(sendPkg);
                                     break;
                                 case sendType.Null:
                                     break;
@@ -58,35 +59,50 @@ namespace Client
             thread.Start();
 
         }
-        public void SendMassgs(string massgs)
+        public void SendMassgs(SendPkg sendPkg)
         {
-
+            client.Send(Jons.ToJsonToByte<SendPkg>(sendPkg));
         }
-        private void SendFile(string path)
+        public void SendFile(SendPkg sendPkg)
         {
-            client.SendFile(path);
+            client.SendFile(sendPkg.Additionalinformation);
         }
-        private void SendMassgs(SendPkg data)
-        {
-
-            
-        }
+        
     }
     public class SendPkg
     {
         public sendType sendType;
-        public object data;
-        public SendPkg(sendType type, object data)
+        /// <summary>
+        /// 额外信息
+        /// </summary>
+        public string Additionalinformation;
+        public MassegsPkg MassegsPkg = null;
+        /// <summary>
+        /// 创建数据
+        /// </summary>
+        /// <param name="type">发送类型</param>
+        /// <param name="data">额外信息</param>
+        /// <param name="massegsPkg">发送的包</param>
+        public SendPkg(sendType type, string data, MassegsPkg massegsPkg)
         {
             sendType = type;
-            this.data = data;
+            this.Additionalinformation = data;
+            this.MassegsPkg = massegsPkg;
         }
+
+    }
+
+    /// <summary>
+    /// 自定义包 你的数据
+    /// </summary>
+    public class MassegsPkg
+    {
 
     }
     public enum sendType
     {
-        File,
-        strings,
-        Null
+        File = 1,
+        massegs = 2,
+        Null = 0
     }
 }
