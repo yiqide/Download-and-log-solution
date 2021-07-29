@@ -16,6 +16,8 @@ internal class 服务器
         IPHostEntry iPHostEntry = Dns.GetHostEntry(域名);
         IPAddress iPAddress = iPHostEntry.AddressList[0];
         iPEndPoint = new IPEndPoint(iPAddress, port);
+        socket = new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+        Console.WriteLine(iPEndPoint);
     }
     public void Start()
     {
