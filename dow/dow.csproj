@@ -5,4 +5,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="RRQMSocket" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="RRQMSocket" Version="5.3.0.1" />
+  </ItemGroup>
 </Project>
