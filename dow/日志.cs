@@ -21,7 +21,7 @@ namespace dow
         private void init(string path, string fileName)
         {
             queue = new Queue<byte[]>();
-            string p = path + @"\" + fileName;
+            string p = path + "/" + fileName;
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -33,12 +33,13 @@ namespace dow
                 f.Dispose();
             }
             streamWriter = File.AppendText(p);
+            Console.WriteLine(p);
             thread = new Thread(() =>
             {
+                byte[] vs;
                 while (true)
                 {
                     ManualResetEvent.WaitOne();
-                    byte[] vs;
                     queue.TryPeek(out vs);
                     if (vs != null)
                     {
@@ -66,6 +67,13 @@ namespace dow
         {
             if (thread == null) init(path, fileName);
             queue.Enqueue(UnicodeEncoding.UTF8.GetBytes(data));
+            //如果线程没有启动就启动线程
+            ManualResetEvent.Set();
+        }
+        public void addLog(byte[] data)
+        {
+            if (thread == null) init(path, fileName);
+            queue.Enqueue(data);
             //如果线程没有启动就启动线程
             ManualResetEvent.Set();
         }
